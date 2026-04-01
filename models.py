@@ -74,7 +74,8 @@ class Leave(BaseModel):
     leave_type: Mapped[LeaveType] = mapped_column(Enum(LeaveType), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime,
-        default=datetime.datetime.utcnow,
+        default=datetime.datetime.now(datetime.timezone.utc),
     )
+    remarks: Mapped[str] = mapped_column(String(255), nullable=True)
 
     employee: Mapped[Employee] = relationship("Employee", back_populates="leaves")
