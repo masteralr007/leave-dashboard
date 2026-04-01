@@ -17,7 +17,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__, template_folder="../templates", static_folder="../static")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if not os.path.exists(os.path.join(BASE_DIR, "templates")):
+    BASE_DIR = os.getcwd()
+
+app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"), static_folder=os.path.join(BASE_DIR, "static"))
 app.config.from_object("config.AppConfig")
 
 init_app_database(app)
@@ -36,8 +40,16 @@ def index():
 
 @app.route("/health-check")
 def health_check():
-    return {"status": "OK"}
-
+    import os
+    return {
+        "status": "OK",
+        "template_folder": app.template_folder,
+        "static_folder": app.static_folder,
+        "cwd": os.getcwd(),
+        "file_path": __file__,
+        "templates_exist": os.path.exists(app.template_folder),
+        "templates_content": os.listdir(app.template_folder) if os.path.exists(app.template_folder) else []
+    }
 
 if __name__ == "__main__":
     with app.app_context():
